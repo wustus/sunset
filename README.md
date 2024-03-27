@@ -5,7 +5,7 @@
 ![image info](img/sketch.png)
 
 Ich möcchte in jede Ecke meines Zimmers einen kleinen Motor stellen welcher jeweils von einem Raspberry Pi gesteuert wird.
-jeder Raspberry Pi folgt dabei den Befehlen des *master*-Pi welcher zufällig gewählt wird. Der *master* erstellt einen Pfad und die Laufzeit in welcher das fliegebde Objekt von Punkt `$$P_{start}$$` bis zu `$$P_{ziel}$$` kommt.
+jeder Raspberry Pi folgt dabei den Befehlen des *master*-Pi welcher zufällig gewählt wird. Der *master* erstellt einen Pfad und die Laufzeit in welcher das fliegebde Objekt von Punkt `P_start` bis zu `P_ziel` kommt.
 Dabei wird allen Raspberry Pi's die nächste Koordinate und Zeit geschickt bis diese erreicht sein muss. Die Pi's müssen daraufhin von ihrer momentanen Position die folgenden Schritte berechnen und ihre jeweiligen Motoren so bedinenen, dass das Objekt so nah wie möglich am berechneten Pfad entlangfliegt.
 Die Pi's wissen nichts voneinander und nehmen nur Befehle des Master-Pi entgegen.
 
