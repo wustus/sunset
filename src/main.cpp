@@ -1,6 +1,6 @@
 
 #include <cstdint>
-#include <iostream>
+#include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -21,11 +21,16 @@ int main() {
 
     int fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (fd == -1) {
-        printf("Unable to open /dev/mem\n");
+        perror("Unable to open /dev/mem");
         return -1;
     }
 
     uint32_t* reg_base = (uint32_t*) mmap(NULL, 32, PROT_READ | PROT_WRITE, MAP_SHARED, fd, pd15_addr);
+
+    if (reg_base == MAP_FAILED) {
+	perror("Error mapping memory");
+	return -1;
+    }
 
     printf("%d\n", *reg_base);
 
