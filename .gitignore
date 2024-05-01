@@ -3,6 +3,7 @@ c4d
 bin
 CMakeFiles
 CMakeCache.txt
+Makefile
 *.cmake
 .DS_STORE
 
