@@ -52,8 +52,6 @@ int print_register(uint32_t addr, uint16_t bytes) {
     std::memcpy(reg, reg_base, bytes);
 
     for (int i=0; i!=bytes; i++) {
-        printf("%d", i);
-        printf("%p - ", reg_base + 0x70 + i);
         printf("%x - ", addr + i);
         print_binary(reg[i]);
         printf("\n");
@@ -71,8 +69,8 @@ int main() {
 
     printf("Hello 0х0300 B000---0×0300 B3FF\n");
 
-    // print_register(0x0300B000, 128);
-    // return 0;
+    print_register(0x0300B000, 128);
+    return 0;
 
     uint32_t pd15_offset = 0x0070;
     uint32_t base_addr = 0x0300B000;
