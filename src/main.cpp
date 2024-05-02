@@ -1,4 +1,5 @@
 
+#include "gpio.h"
 #include <cstdint>
 #include <cstring>
 #include <stdio.h>
@@ -83,7 +84,21 @@ int main() {
 
     printf("Hello 0х0300 B000---0×0300 B3FF\n");
 
+    init();
+    set_pin_direction(PD, 15, CFG_OUT);
 
+    for (int i=0; i!=6400; i++) {
+        set_pin_value(PD, 15, 1);;
+        sleep(std::chrono::microseconds(5000));
+        set_pin_value(PD, 15, 0);;
+        sleep(std::chrono::microseconds(5000));
+    }
+
+    return 0;
+
+
+
+    /*
     uint32_t pd15_offset = 0x0070;
     uint32_t base_addr = 0x0300B000;
 
@@ -138,6 +153,7 @@ int main() {
 
 
     munmap(reg_base, 1024);
+    */
 
     return 0;
 }

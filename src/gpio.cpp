@@ -27,6 +27,10 @@ int init() {
     return 0;
 }
 
+void clean() {
+    munmap(gpio.reg_base, 1024);
+}
+
 
 void* get_register(uint32_t reg, uint32_t pin) {
 
