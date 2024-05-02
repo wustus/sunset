@@ -52,7 +52,7 @@ int print_register(uint32_t addr, uint16_t bytes) {
     std::memcpy(reg, reg_base, bytes);
 
     for (int i=0; i!=bytes; i+=4) {
-        printf("%x - ", addr + i);
+        printf("%p - ", addr + i);
         print_binary(reg[i]);
         printf(" ");
         print_binary(reg[i+1]);
