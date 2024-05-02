@@ -75,8 +75,8 @@ int main() {
 
     printf("Hello 0х0300 B000---0×0300 B3FF\n");
 
-    print_register(0x0300B000, 1024);
-    return 0;
+    // print_register(0x0300B000, 1024);
+    // return 0;
 
     uint32_t pd15_offset = 0x0070;
     uint32_t base_addr = 0x0300B000;
@@ -97,7 +97,7 @@ int main() {
     uchar* gpio_values = new uchar[1024];
 
     uchar* on = new uchar[1];
-    *on = 0b00000000;
+    *on = 0b11000000;
     uchar* off = new uchar[1];
     *off = 0b01000000;
 
@@ -110,11 +110,11 @@ int main() {
     // return 0;
 
     while (true) {
-        *(uchar*)(reg_base + 0x7d) = *off;
+        *(uchar*)(reg_base + 0x7d) = *on;
         pb(*(uchar*)(reg_base + 0x7d));
         printf("\n");
         sleep(std::chrono::microseconds(10000));
-        *(uchar*)(reg_base + 0x7d) = *on;
+        *(uchar*)(reg_base + 0x7d) = *off;
         pb(*(uchar*)(reg_base + 0x7d));
         printf("\n");
         sleep(std::chrono::microseconds(10000));
