@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <chrono>
 #include <thread>
+#include <csignal>
 
 /*
  * This is it. We're going cool mode.
@@ -71,12 +72,17 @@ void sleep(std::chrono::microseconds duration) {
     std::this_thread::sleep_for(duration);
 }
 
+void handle_signal(int signal) {
+    print_register(0x0300B000, 1024);
+    exit(0);
+}
+
 int main() {
+
+    std::signal(SIGINT, handle_signal);
 
     printf("Hello 0х0300 B000---0×0300 B3FF\n");
 
-    // print_register(0x0300B000, 1024);
-    // return 0;
 
     uint32_t pd15_offset = 0x0070;
     uint32_t base_addr = 0x0300B000;
@@ -96,10 +102,12 @@ int main() {
 
     uchar* gpio_values = new uchar[1024];
 
-    uchar* on = new uchar[1];
-    *on = 0b11000000;
-    uchar* off = new uchar[1];
+    uchar* on = new uchar[2];
+    *on = 0b01000000;
+    *(on+1) = 0b11000000;
+    uchar* off = new uchar[2];
     *off = 0b01000000;
+    *(off+1) = 0b01000000;
 
     // for (int i=0; i!=128; i++) {
     //     printf("%x - ", base_addr + 0x70 + i);
@@ -110,15 +118,16 @@ int main() {
     // return 0;
 
     while (true) {
-        *(uchar*)(reg_base + 0x7d) = *on;
+	std::memcpy(reg_base + 0x7c, (void*) on, 2);
         pb(*(uchar*)(reg_base + 0x7d));
         printf("\n");
-        sleep(std::chrono::microseconds(10000));
-        *(uchar*)(reg_base + 0x7d) = *off;
+        sleep(std::chrono::microseconds(50));
+	std::memcpy(reg_base + 0x7c, (void*) off, 2);
         pb(*(uchar*)(reg_base + 0x7d));
         printf("\n");
-        sleep(std::chrono::microseconds(10000));
+        sleep(std::chrono::microseconds(50));
     }
+
 
     // void* pd_conf_1_base_addr = (void*)((uintptr_t) reg_base + pd15_offset);
     // uint32_t pd_conf_1 = *(uint32_t*) pd_conf_1_base_addr;
