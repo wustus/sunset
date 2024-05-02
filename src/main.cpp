@@ -54,11 +54,11 @@ int print_register(uint32_t addr, uint16_t bytes) {
     for (int i=0; i!=bytes; i+=4) {
         printf("%x - ", addr + i);
         print_binary(reg[i]);
-        printf(" - ");
+        printf(" ");
         print_binary(reg[i+1]);
-        printf(" - ");
+        printf(" ");
         print_binary(reg[i+2]);
-        printf(" - ");
+        printf(" ");
         print_binary(reg[i+3]);
         printf("\n");
     }
