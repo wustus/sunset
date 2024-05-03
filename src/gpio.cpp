@@ -35,6 +35,8 @@ void clean() {
 void* get_register(uint32_t reg, uint32_t pin) {
 
     uchar* reg_base = (uchar*) gpio.reg_base;
+        printf("Memory Address: %x\n", (GPIO_BASE + pin * REG_N + reg));
+
     return (void*) (reg_base + pin * REG_N + reg);
 }
 
@@ -45,6 +47,9 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
 
     int32_t byte_offset = (pin_id % 8) / 2;
 
+    printf("Mapped Register: %p\n", reg);
+    printf("Byte Offset: %x\n", byte_offset);
+
     // pid % 2 == 1 is more significant than pid % 2 == 0
     uchar n_shift = ((pin_id % 2) * 4);
     uchar n_shift_mask = ((1 - pin_id % 2) * 4);
@@ -54,9 +59,13 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
     uchar* pin_reg = (uchar*) reg + byte_offset;
     uchar pin_reg_val = *pin_reg;
 
+    printf("%d\n", pin_reg_val);
+
 
     pin_reg_val &= pin_mask;
     pin_reg_val |= dir << n_shift;
+
+    printf("%d\n", pin_reg_val);
 
     *pin_reg = pin_reg_val;
 }
@@ -77,4 +86,6 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
     pin_reg_val |= pin_val;
 
     *pin_reg = pin_reg_val;
+    printf("%d\n", pin_val);
+    printf("%d\n", pin_reg_val);
 }

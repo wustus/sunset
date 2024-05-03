@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <csignal>
+#include <iostream>
 
 /*
  * This is it. We're going cool mode.
@@ -86,12 +87,16 @@ int main() {
 
     init();
     set_pin_direction(PD, 15, CFG_OUT);
+    // print_register(0x0300B000, 1024);
+    // return 0 ;
+    
+    char c;
 
     for (int i=0; i!=6400; i++) {
-        set_pin_value(PD, 15, 1);;
-        sleep(std::chrono::microseconds(5000));
-        set_pin_value(PD, 15, 0);;
-        sleep(std::chrono::microseconds(5000));
+        set_pin_value(PD, 15, 1);
+        sleep(std::chrono::microseconds(50000));
+        set_pin_value(PD, 15, 0);
+        sleep(std::chrono::microseconds(50000));
     }
 
     return 0;
