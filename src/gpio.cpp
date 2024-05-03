@@ -1,6 +1,5 @@
 
 #include "gpio.h"
-#include "helper.h"
 
 #include <cstdint>
 #include <cstdio>
@@ -37,7 +36,6 @@ void* get_register(uint32_t reg, uint32_t pin) {
 
     uchar* reg_base = (uchar*) gpio.reg_base;
     printf("Memory Address: %x\n", (GPIO_BASE + pin * REG_N + reg));
-    printf("%p\n", (void*) (reg_base + pin * REG_N + reg));
 
     return (void*) (reg_base + pin * REG_N + reg);
 }
@@ -45,38 +43,57 @@ void* get_register(uint32_t reg, uint32_t pin) {
 
 void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
 
+    printf("PIN P%c%d\n", (char) (pin + 65), pin_id);
+    printf("Direction: "); print_byte(dir); 
+
+    printf("\n");
+
     void* reg = get_register(CFG_1, pin);
 
     int32_t byte_offset = (pin_id % 8) / 2;
 
     printf("Mapped Register: %p\n", reg);
+
+    printf("Register: \n");
+    print_register(reg);
+    printf("\n");
+
     printf("Byte Offset: %x\n", byte_offset);
 
     // pid % 2 == 1 is more significant than pid % 2 == 0
     uchar n_shift = ((pin_id % 2) * 4);
     uchar n_shift_mask = ((1 - pin_id % 2) * 4);
-    uchar pin_mask = 0x8 << n_shift_mask;
+    uchar pin_mask = 0x7 << n_shift_mask;
+
+    printf("Pin Mask: "); print_byte(pin_mask);
 
     // read out pin register of pin
-    uchar* pin_reg = (uchar*) reg + byte_offset;
+    uchar* pin_reg = (uchar*) reg + byte_offset * 4;
+    printf("%p\n", pin_reg);
+
+    printf("%d\n", *pin_reg);
     uchar pin_reg_val = *pin_reg;
 
     printf("Register Value: ");
     print_byte(pin_reg_val);
-    printf("\n");
 
     pin_reg_val &= pin_mask;
     pin_reg_val |= dir << n_shift;
 
     printf("New Register Value: ");
     print_byte(pin_reg_val);
-    printf("\n");
 
     *pin_reg = pin_reg_val;
+
+    printf("Register: \n");
+    print_register(reg);
 }
 
 
 void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
+
+    printf("PIN P%c%d\n", (char) (pin + 65), pin_id);
+    printf("Value: "); print_byte(val); 
 
     void* reg = get_register(DAT, pin);
     uint32_t byte_offset = pin_id / 8;
@@ -87,12 +104,17 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
     uchar pin_mask = ~(0x1 << (pin_id % 8));
     uchar pin_val = val << (pin_id % 8);
 
+    printf("Pin Mask: "); print_byte(pin_mask); 
+    printf("Pin Value: "); print_byte(pin_val); 
+
     uchar* pin_reg = (uchar*) reg + byte_offset;
+
+    printf("Selected Byte: %p\n", pin_reg);
+
     uchar pin_reg_val = *pin_reg;
 
     printf("Register Value: ");
     print_byte(pin_reg_val);
-    printf("\n");
 
     pin_reg_val &= pin_mask;
     pin_reg_val |= pin_val;
@@ -101,5 +123,4 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
 
     printf("New Register Value: ");
     print_byte(pin_reg_val);
-    printf("\n");
 }

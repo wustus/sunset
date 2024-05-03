@@ -75,7 +75,7 @@ void sleep(std::chrono::microseconds duration) {
 }
 
 void handle_signal(int signal) {
-    print_register(0x0300B000, 1024);
+    print_register(0x0300B000, 128);
     exit(0);
 }
 
@@ -94,6 +94,7 @@ int main() {
 
     printf("--- DIRECTION ---\n");
     set_pin_direction(PD, 15, CFG_OUT);
+    printf("\n");
     // print_register(0x0300B000, 1024);
     // return 0 ;
     

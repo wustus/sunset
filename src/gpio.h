@@ -5,7 +5,8 @@
 #include <chrono>
 #include <cstdint>
 
-typedef unsigned char uchar;
+#include "helper.h"
+
 
 // gpio base address
 #define GPIO_BASE 0x0300B000
