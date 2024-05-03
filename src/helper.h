@@ -14,10 +14,10 @@ void print_byte(T t) {
     uchar* val = reinterpret_cast<uchar*>(&t);
 
     for (int b=n_b-1; b>=0; b--) {
-	for (int i=7; i>=0; i--) {
+        for (int i=7; i>=0; i--) {
             std::cout << ((*(val + b) >> i) & 1);
-    	}
-	std::cout << " ";
+        }
+        std::cout << " ";
     }
 
     std::cout << std::endl;

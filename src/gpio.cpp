@@ -28,20 +28,20 @@ int init() {
 }
 
 void clean() {
-    munmap(gpio.reg_base, 1024);
+    munmap(gpio.reg_base, GPIO_MEMORY_LENGTH);
 }
 
 
-void* get_register(uint32_t reg, uint32_t pin) {
+void* get_register(uchar reg, uchar pin) {
 
     uchar* reg_base = (uchar*) gpio.reg_base;
     printf("Memory Address: %x\n", (GPIO_BASE + pin * REG_N + reg));
 
-    return (void*) (reg_base + pin * REG_N + reg);
+    return (uchar*) (reg_base + pin * REG_N + reg);
 }
 
 
-void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
+void set_pin_direction(uchar pin, uchar pin_id, uchar dir) {
 
     printf("PIN P%c%d\n", (char) (pin + 65), pin_id);
     printf("Direction: "); print_byte(dir); 
@@ -90,7 +90,7 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
 }
 
 
-void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
+void set_pin_value(uchar pin, uchar pin_id, uchar val) {
 
     printf("PIN P%c%d\n", (char) (pin + 65), pin_id);
     printf("Value: "); print_byte(val); 

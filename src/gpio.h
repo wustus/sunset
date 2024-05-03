@@ -67,15 +67,15 @@
 
 struct GPIO {
     int fd;
-    void* reg_base;
+    uchar* reg_base;
 };
 
 int init();
 void clean();
 
-void* get_register(uint32_t reg, uint32_t pin);
-void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir);
-void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val);
+void* get_register(uchar reg, uchar pin);
+void set_pin_direction(uchar pin, uchar pin_id, uchar dir);
+void set_pin_value(uchar pin, uchar pin_id, uchar val);
 
 
 #endif
