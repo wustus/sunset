@@ -50,7 +50,7 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
 
     void* reg = get_register(CFG_1, pin);
 
-    int32_t byte_offset = (pin_id % 8) / 2;
+    uchar byte_offset = (pin_id % 8) / 2;
 
     printf("Mapped Register: %p\n", reg);
 
@@ -68,7 +68,7 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
     printf("Pin Mask: "); print_byte(pin_mask);
 
     // read out pin register of pin
-    uchar* pin_reg = (uchar*) reg + byte_offset * 4;
+    uchar* pin_reg = (uchar*) reg + byte_offset;
     printf("%p\n", pin_reg);
 
     printf("%d\n", *pin_reg);
@@ -96,7 +96,7 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
     printf("Value: "); print_byte(val); 
 
     void* reg = get_register(DAT, pin);
-    uint32_t byte_offset = pin_id / 8;
+    uchar byte_offset = pin_id / 8;
 
     printf("Mapped Register: %p\n", reg);
     printf("Byte Offset: %x\n", byte_offset);
