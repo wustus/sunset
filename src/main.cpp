@@ -55,7 +55,7 @@ int print_register(uint32_t addr, uint16_t bytes) {
     std::memcpy(reg, reg_base, bytes);
 
     for (int i=0; i!=bytes; i+=4) {
-        printf("%p - ", addr + i);
+        printf("%x - ", (addr + i));
         print_binary(reg[i]);
         printf(" ");
         print_binary(reg[i+1]);
@@ -92,6 +92,7 @@ int main() {
         exit(1);
     }
 
+    printf("--- DIRECTION ---\n");
     set_pin_direction(PD, 15, CFG_OUT);
     // print_register(0x0300B000, 1024);
     // return 0 ;

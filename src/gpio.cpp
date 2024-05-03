@@ -81,16 +81,25 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uchar val) {
     void* reg = get_register(DAT, pin);
     uint32_t byte_offset = pin_id / 8;
 
+    printf("Mapped Register: %p\n", reg);
+    printf("Byte Offset: %x\n", byte_offset);
+
     uchar pin_mask = ~(0x1 << (pin_id % 8));
     uchar pin_val = val << (pin_id % 8);
 
     uchar* pin_reg = (uchar*) reg + byte_offset;
     uchar pin_reg_val = *pin_reg;
 
+    printf("Register Value: ");
+    print_byte(pin_reg_val);
+    printf("\n");
+
     pin_reg_val &= pin_mask;
     pin_reg_val |= pin_val;
 
     *pin_reg = pin_reg_val;
-    printf("%d\n", pin_val);
-    printf("%d\n", pin_reg_val);
+
+    printf("New Register Value: ");
+    print_byte(pin_reg_val);
+    printf("\n");
 }
