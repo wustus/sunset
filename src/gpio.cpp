@@ -1,5 +1,6 @@
 
 #include "gpio.h"
+#include "helper.h"
 
 #include <cstdint>
 #include <cstdio>
@@ -35,7 +36,8 @@ void clean() {
 void* get_register(uint32_t reg, uint32_t pin) {
 
     uchar* reg_base = (uchar*) gpio.reg_base;
-        printf("Memory Address: %x\n", (GPIO_BASE + pin * REG_N + reg));
+    printf("Memory Address: %x\n", (GPIO_BASE + pin * REG_N + reg));
+    printf("%p\n", (void*) (reg_base + pin * REG_N + reg));
 
     return (void*) (reg_base + pin * REG_N + reg);
 }
@@ -59,13 +61,16 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uchar dir) {
     uchar* pin_reg = (uchar*) reg + byte_offset;
     uchar pin_reg_val = *pin_reg;
 
-    printf("%d\n", pin_reg_val);
-
+    printf("Register Value: ");
+    print_byte(pin_reg_val);
+    printf("\n");
 
     pin_reg_val &= pin_mask;
     pin_reg_val |= dir << n_shift;
 
-    printf("%d\n", pin_reg_val);
+    printf("New Register Value: ");
+    print_byte(pin_reg_val);
+    printf("\n");
 
     *pin_reg = pin_reg_val;
 }

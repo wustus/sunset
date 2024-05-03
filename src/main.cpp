@@ -85,7 +85,13 @@ int main() {
 
     printf("Hello 0х0300 B000---0×0300 B3FF\n");
 
-    init();
+    int err = init();
+
+    if (err != 0) {
+        printf("exit 1\n");
+        exit(1);
+    }
+
     set_pin_direction(PD, 15, CFG_OUT);
     // print_register(0x0300B000, 1024);
     // return 0 ;
@@ -93,10 +99,16 @@ int main() {
     char c;
 
     for (int i=0; i!=6400; i++) {
+        printf("--- ON ---\n");
         set_pin_value(PD, 15, 1);
+        printf("\n");
         sleep(std::chrono::microseconds(50000));
+        printf("--- OFF ---\n");
         set_pin_value(PD, 15, 0);
+        printf("\n");
         sleep(std::chrono::microseconds(50000));
+
+        std::cin >> c;
     }
 
     return 0;
