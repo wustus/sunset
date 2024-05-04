@@ -44,29 +44,18 @@ int print_register(uint32_t addr, uint16_t bytes) {
         return -1;
     }
 
-    uchar* reg_base = (uchar*) mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, addr);
+    uint32_t* reg_base = (uint32_t*) mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, addr);
 
     if (reg_base == MAP_FAILED) {
         perror("Error mapping memory");
         return -1;
     }
 
-    uchar* reg = new uchar(bytes);
-    std::memcpy(reg, reg_base, bytes);
-
-    for (int i=0; i!=bytes; i+=4) {
-        printf("%x - ", (addr + i));
-        print_binary(reg[i]);
-        printf(" ");
-        print_binary(reg[i+1]);
-        printf(" ");
-        print_binary(reg[i+2]);
-        printf(" ");
-        print_binary(reg[i+3]);
-        printf("\n");
+    for (int i=0; i!=bytes; i++) {
+        print_register(reg_base + i);
     }
 
-    munmap(reg_base, 1024);
+    munmap(reg_base, bytes);
     return 0;
 }
 
@@ -75,7 +64,7 @@ void sleep(std::chrono::microseconds duration) {
 }
 
 void handle_signal(int signal) {
-    print_register(0x0300B000, 128);
+    print_register(0x0300B000, 32);
     exit(0);
 }
 
@@ -104,13 +93,11 @@ int main() {
         printf("--- ON ---\n");
         set_pin_value(PD, 15, 1);
         printf("\n");
-        sleep(std::chrono::microseconds(50000));
+        sleep(std::chrono::microseconds(5000));
         printf("--- OFF ---\n");
         set_pin_value(PD, 15, 0);
         printf("\n");
-        sleep(std::chrono::microseconds(50000));
-
-        std::cin >> c;
+        sleep(std::chrono::microseconds(5000));
     }
 
     return 0;
