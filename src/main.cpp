@@ -1,16 +1,11 @@
 
 #include "gpio.h"
-#include <cstdint>
-#include <cstring>
 #include <stdio.h>
-#include <iomanip>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <chrono>
-#include <thread>
 #include <csignal>
-#include <iostream>
 
 /*
  * This is it. We're going cool mode.
@@ -20,52 +15,9 @@
  *
  */
 
-typedef unsigned char uchar;
-
-void print_binary(uchar c) {
-
-    for (int i=7; i>=0; i--) {
-        printf("%d", (c >> i) & 1);
-    }
-}
-
-void pb(uint8_t c) {
-
-    for (int i=7; i>=0; i--) {
-        printf("%d", (c >> i) & 1);
-    }
-}
-
-int print_register(uint32_t addr, uint16_t bytes) {
-
-    int fd = open("/dev/mem", O_RDWR | O_SYNC);
-    if (fd == -1) {
-        perror("Unable to open /dev/mem");
-        return -1;
-    }
-
-    uint32_t* reg_base = (uint32_t*) mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, addr);
-
-    if (reg_base == MAP_FAILED) {
-        perror("Error mapping memory");
-        return -1;
-    }
-
-    for (int i=0; i!=bytes; i++) {
-        print_register(reg_base + i);
-    }
-
-    munmap(reg_base, bytes);
-    return 0;
-}
-
-void sleep(std::chrono::microseconds duration) {
-    std::this_thread::sleep_for(duration);
-}
-
 void handle_signal(int signal) {
-    print_register(0x0300B000, 32);
-    exit(0);
+    clean();
+    exit(signal);
 }
 
 int main() {
@@ -81,85 +33,26 @@ int main() {
         exit(1);
     }
 
-    printf("--- DIRECTION ---\n");
     set_pin_direction(PD, 15, CFG_OUT);
-    printf("\n");
-    // print_register(0x0300B000, 1024);
-    // return 0 ;
-    
-    char c;
+    set_pin_direction(PD, 16, CFG_OUT);
 
-    for (int i=0; i!=6400; i++) {
-        printf("--- ON ---\n");
+    for (int i=0; i!=1600; i++) {
         set_pin_value(PD, 15, 1);
-        printf("\n");
-        sleep(std::chrono::microseconds(5000));
-        printf("--- OFF ---\n");
+        sleep(std::chrono::microseconds(625));
         set_pin_value(PD, 15, 0);
-        printf("\n");
-        sleep(std::chrono::microseconds(5000));
+        sleep(std::chrono::microseconds(625));
+    }
+    
+    set_pin_value(PD, 16, 1);
+
+    for (int i=0; i!=1600; i++) {
+        set_pin_value(PD, 15, 1);
+        sleep(std::chrono::microseconds(625));
+        set_pin_value(PD, 15, 0);
+        sleep(std::chrono::microseconds(625));
     }
 
-    return 0;
-
-
-
-    /*
-    uint32_t pd15_offset = 0x0070;
-    uint32_t base_addr = 0x0300B000;
-
-    int fd = open("/dev/mem", O_RDWR | O_SYNC);
-    if (fd == -1) {
-        perror("Unable to open /dev/mem");
-        return -1;
-    }
-
-    uchar* reg_base = (uchar*) mmap(NULL, 1024, PROT_READ | PROT_WRITE, MAP_SHARED, fd, base_addr);
-
-    if (reg_base == MAP_FAILED) {
-        perror("Error mapping memory");
-        return -1;
-    }
-
-    uchar* gpio_values = new uchar[1024];
-
-    uchar* on = new uchar[2];
-    *on = 0b01000000;
-    *(on+1) = 0b11000000;
-    uchar* off = new uchar[2];
-    *off = 0b01000000;
-    *(off+1) = 0b01000000;
-
-    // for (int i=0; i!=128; i++) {
-    //     printf("%x - ", base_addr + 0x70 + i);
-    //     printf("%x - ", reg_base + 0x70 + i);
-    //     pb(*(uchar*)(reg_base + 0x70 + i));
-    //     printf("\n");
-    // }
-    // return 0;
-
-    while (true) {
-	std::memcpy(reg_base + 0x7c, (void*) on, 2);
-        pb(*(uchar*)(reg_base + 0x7d));
-        printf("\n");
-        sleep(std::chrono::microseconds(50));
-	std::memcpy(reg_base + 0x7c, (void*) off, 2);
-        pb(*(uchar*)(reg_base + 0x7d));
-        printf("\n");
-        sleep(std::chrono::microseconds(50));
-    }
-
-
-    // void* pd_conf_1_base_addr = (void*)((uintptr_t) reg_base + pd15_offset);
-    // uint32_t pd_conf_1 = *(uint32_t*) pd_conf_1_base_addr;
-
-    uchar pd_conf_1_addr = gpio_values[0x7d]; // gpio_values + 0x0070;
-                                                      // printf("%d\n", (*pd_conf_1_addr & (0b111 << 4)) >> 4);
-    print_binary(pd_conf_1_addr);
-
-
-    munmap(reg_base, 1024);
-    */
+    clean();
 
     return 0;
 }
