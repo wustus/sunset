@@ -24,8 +24,6 @@ int main() {
 
     std::signal(SIGINT, handle_signal);
 
-    printf("Hello 0х0300 B000---0×0300 B3FF\n");
-
     int err = init();
 
     if (err != 0) {
