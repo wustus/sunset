@@ -112,7 +112,7 @@ int accept_connection() {
 
     int conn;
 
-    if ((conn = accept(sckt, (sockaddr*) &info.bind_addr, &sckt_len)) == -1) {
+    if ((conn = accept(sckt, (struct sockaddr*) &info.bind_addr, &sckt_len)) == -1) {
         std::cerr << "Unable to accept connection: " << strerror(errno) << std::endl;
         exit(1);
     }

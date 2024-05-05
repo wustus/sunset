@@ -34,7 +34,7 @@
 struct NetInfo {
     char addr[INET_ADDRSTRLEN];
     int socket;
-    sockaddr_in bind_addr;
+    struct sockaddr_in bind_addr;
 };
 
 void set_local_address();
