@@ -39,6 +39,7 @@ struct NetInfo {
 
 void set_local_address();
 
+void net_clean();
 void create_socket();
 void bind_socket();
 void listen_on_socket();

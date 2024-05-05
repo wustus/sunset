@@ -71,8 +71,8 @@ struct GPIO {
 };
 
 struct MotorControl {
-    uint32_t hz;
-    uint16_t duration;
+    uint8_t hz;
+    uint8_t duration;
     bool clockwise;
 };
 

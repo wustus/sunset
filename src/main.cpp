@@ -1,6 +1,7 @@
 
 #include "gpio.h"
 #include "net.h"
+#include <cstdint>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -25,34 +26,48 @@ int main() {
 
     std::signal(SIGINT, handle_signal);
 
-    // int err = init();
+    int err = init();
 
-    // if (err != 0) {
-    //     printf("exit 1\n");
-    //     exit(1);
-    // }
+    if (err != 0) {
+        printf("exit 1\n");
+        exit(1);
+    }
 
     create_socket();
     bind_socket();
     listen_on_socket();
     int sckt = accept_connection();
 
-    char* data = read_from_socket(sckt, sizeof(MotorControl));
+    char* data;
 
-    MotorControl* controls = reinterpret_cast<MotorControl*>(data);
+    while ((data = read_from_socket(sckt, sizeof(MotorControl))) != 0) {
 
-    // in seconds
-    float t_sleep = 1.0f / (controls->hz * 2);
+        MotorControl* controls = reinterpret_cast<MotorControl*>(data);
 
-    if (controls->clockwise) {
-        set_pin_value(PD, 16, 1);
-    }
+        std::cout << "Motor Controls:" << std::endl;
+        std::cout << "Hz - " << (int) controls->hz << std::endl;
+        std::cout << "Duration - " << (int) controls->duration << std::endl;
+        std::cout << "Clockwise - " << controls->clockwise << std::endl;
 
-    for (int i=0; i!=controls->hz * controls->duration; i++) {
-        set_pin_value(PD, 15, 1);
-        sleep(std::chrono::microseconds((uint32_t) t_sleep * 1'000'000));
-        set_pin_value(PD, 15, 0);
-        sleep(std::chrono::microseconds((uint32_t) t_sleep * 1'000'000));
+        int hz = (int) controls->hz;
+        int duration = (int) controls->duration;
+
+        // in seconds
+        float t_sleep = 1.0f / (1600 * hz * 2);
+
+        if (controls->clockwise) {
+            set_pin_value(PD, 16, 1);
+        }
+
+        std::cout << "Steps: " << hz * duration * 1600 << std::endl;
+        std::cout << "Timeout: " << (uint32_t) (t_sleep * 1'000'000) << std::endl;
+
+        for (int i=0; i!=hz * duration * 1600; i++) {
+            set_pin_value(PD, 15, 1);
+            sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
+            set_pin_value(PD, 15, 0);
+            sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
+        }
     }
 
     clean();

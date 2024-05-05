@@ -1,6 +1,5 @@
 
 #include "net.h"
-#include <cstring>
 
 NetInfo info;
 
@@ -43,9 +42,13 @@ void set_local_address() {
     printf("IP Addr: %s", ip_addr);
 }
 
+void net_clean() {
+    close(info.socket);
+}
+
 void create_socket() {
 
-    int sckt = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int sckt = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
     if (sckt == -1) {
         std::cerr << "Unable to create socket" << std::endl;
@@ -77,22 +80,22 @@ void bind_socket() {
 
     int opt = 1;
 
-    if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+    if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
         close(sckt);
         std::cerr << "Unable to set Reuse Address option: " << strerror(errno) << std::endl;
         exit(1);
     }
 
-    struct timeval timeout;
-    std::memset(&timeout, 0, sizeof(timeout));
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    // struct timeval timeout;
+    // std::memset(&timeout, 0, sizeof(timeout));
+    // timeout.tv_sec = 1;
+    // timeout.tv_usec = 0;
 
-    if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
-        close(sckt);
-        std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
-        exit(1);
-    }
+    // if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
+    //     close(sckt);
+    //     std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
+    //     exit(1);
+    // }
 }
 
 void listen_on_socket() {
@@ -116,6 +119,8 @@ int accept_connection() {
         std::cerr << "Unable to accept connection: " << strerror(errno) << std::endl;
         exit(1);
     }
+
+    std::cout << "Accepted connection." << std::endl;
 
     return conn;
 }
