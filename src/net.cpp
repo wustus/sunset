@@ -1,5 +1,6 @@
 
 #include "net.h"
+#include <cstring>
 
 NetInfo info;
 
@@ -42,7 +43,7 @@ void set_local_address() {
     printf("IP Addr: %s", ip_addr);
 }
 
-int create_socket() {
+void create_socket() {
 
     int sckt = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -51,7 +52,7 @@ int create_socket() {
         exit(1);
     }
 
-    return sckt;
+    info.socket = sckt;
 }
 
 
@@ -68,7 +69,7 @@ void bind_socket() {
 
     if (bind(sckt, (struct sockaddr*) &bind_addr, sizeof(sockaddr_in)) == -1) {
         close(sckt);
-        std::cerr << "Unable to bind socket." << std::endl;
+        std::cerr << "Unable to bind socket: " << strerror(errno) <<  std::endl;
         exit(1);
     }
 
@@ -78,17 +79,18 @@ void bind_socket() {
 
     if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         close(sckt);
-        std::cerr << "Unable to set Reuse Address option." << std::endl;
+        std::cerr << "Unable to set Reuse Address option: " << strerror(errno) << std::endl;
         exit(1);
     }
 
     struct timeval timeout;
+    std::memset(&timeout, 0, sizeof(timeout));
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
-    if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == 0) {
+    if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
         close(sckt);
-        std::cerr << "Unable to set Timeout socket option." << std::endl;
+        std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
         exit(1);
     }
 }
@@ -98,7 +100,7 @@ void listen_on_socket() {
     int sckt = info.socket;
 
     if (listen(sckt, 3) == -1) {
-        std::cerr << "Unable to start listening." << std::endl;
+        std::cerr << "Unable to start listening: " << strerror(errno) << std::endl;
         exit(1);
     }
 }
@@ -111,7 +113,7 @@ int accept_connection() {
     int conn;
 
     if ((conn = accept(sckt, (sockaddr*) &info.bind_addr, &sckt_len)) == -1) {
-        std::cerr << "Unable to accept connection." << std::endl;
+        std::cerr << "Unable to accept connection: " << strerror(errno) << std::endl;
         exit(1);
     }
 
