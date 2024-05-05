@@ -1,14 +1,5 @@
 
 #include "net.h"
-#include <arpa/inet.h>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <sys/_types/_socklen_t.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 NetInfo info;
 

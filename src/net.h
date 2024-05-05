@@ -6,10 +6,14 @@
 
 #include <arpa/inet.h>
 #include <cstddef>
+#include <cstdio>
+#include <cstring>
 #include <ifaddrs.h>
 #include <sys/socket.h>
+#include <sys/_types/_socklen_t.h>
 #include <sys/_endian.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 /**
  * We need two modes of operation:
