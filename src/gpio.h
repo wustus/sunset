@@ -70,6 +70,12 @@ struct GPIO {
     uint32_t* reg_base;
 };
 
+struct MotorControl {
+    uint32_t hz;
+    uint16_t duration;
+    bool clockwise;
+};
+
 int init();
 void clean();
 

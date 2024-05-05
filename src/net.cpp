@@ -1,10 +1,12 @@
 
 #include "net.h"
 #include <arpa/inet.h>
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <ifaddrs.h>
 #include <netinet/in.h>
+#include <sys/_types/_socklen_t.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -79,6 +81,8 @@ void bind_socket() {
         exit(1);
     }
 
+    info.bind_addr = bind_addr;
+
     int opt = 1;
 
     if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
@@ -98,7 +102,7 @@ void bind_socket() {
     }
 }
 
-void listen() {
+void listen_on_socket() {
 
     int sckt = info.socket;
 
@@ -106,5 +110,27 @@ void listen() {
         std::cerr << "Unable to start listening." << std::endl;
         exit(1);
     }
+}
 
+int accept_connection() {
+
+    int sckt = info.socket;
+    socklen_t sckt_len = sizeof(info.bind_addr);
+
+    int conn;
+
+    if ((conn = accept(sckt, (sockaddr*) &info.bind_addr, &sckt_len)) == -1) {
+        std::cerr << "Unable to accept connection." << std::endl;
+        exit(1);
+    }
+
+    return conn;
+}
+
+char* read_from_socket(int sckt, size_t buff_size) {
+
+    char* buffer = new char[buff_size];
+    read(sckt, buffer, buff_size);
+
+    return buffer;
 }

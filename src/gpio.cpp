@@ -25,6 +25,11 @@ int init() {
         return -1;
     }
 
+    // step pin
+    set_pin_direction(PD, 15, CFG_OUT);
+    // direction pin
+    set_pin_direction(PD, 16, CFG_OUT);
+
     return 0;
 }
 

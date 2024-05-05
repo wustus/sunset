@@ -5,6 +5,7 @@
 #include "helper.h"
 
 #include <arpa/inet.h>
+#include <cstddef>
 #include <ifaddrs.h>
 #include <sys/socket.h>
 #include <sys/_endian.h>
@@ -31,14 +32,15 @@
 struct NetInfo {
     char addr[INET_ADDRSTRLEN];
     int socket;
-
+    sockaddr_in bind_addr;
 };
 
 void set_local_address();
 
 int create_socket();
-void bind(int);
-void listen();
-
+void bind_socket();
+void listen_on_socket();
+int accept_connection();
+char* read_from_socket(int, size_t);
 
 #endif

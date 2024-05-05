@@ -1,5 +1,6 @@
 
 #include "gpio.h"
+#include "net.h"
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -31,23 +32,27 @@ int main() {
         exit(1);
     }
 
-    set_pin_direction(PD, 15, CFG_OUT);
-    set_pin_direction(PD, 16, CFG_OUT);
+    create_socket();
+    bind_socket();
+    listen_on_socket();
+    int sckt = accept_connection();
 
-    for (int i=0; i!=1600; i++) {
-        set_pin_value(PD, 15, 1);
-        sleep(std::chrono::microseconds(625));
-        set_pin_value(PD, 15, 0);
-        sleep(std::chrono::microseconds(625));
+    char* data = read_from_socket(sckt, sizeof(MotorControl));
+
+    MotorControl* controls = reinterpret_cast<MotorControl*>(data);
+
+    // in seconds
+    float t_sleep = 1.0f / (controls->hz * 2);
+
+    if (controls->clockwise) {
+        set_pin_value(PD, 16, 1);
     }
-    
-    set_pin_value(PD, 16, 1);
 
-    for (int i=0; i!=1600; i++) {
+    for (int i=0; i!=controls->hz * controls->duration; i++) {
         set_pin_value(PD, 15, 1);
-        sleep(std::chrono::microseconds(625));
+        sleep(std::chrono::microseconds((uint32_t) t_sleep * 1'000'000));
         set_pin_value(PD, 15, 0);
-        sleep(std::chrono::microseconds(625));
+        sleep(std::chrono::microseconds((uint32_t) t_sleep * 1'000'000));
     }
 
     clean();
