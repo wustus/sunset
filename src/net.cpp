@@ -1,6 +1,5 @@
 
 #include "net.h"
-#include <sys/_types/_fd_def.h>
 #include <sys/socket.h>
 
 NetInfo info;
@@ -84,16 +83,16 @@ void bind_socket() {
         exit(1);
     }
 
-    // struct timeval timeout;
-    // std::memset(&timeout, 0, sizeof(timeout));
-    // timeout.tv_sec = 1;
-    // timeout.tv_usec = 0;
+    struct timeval timeout;
+    std::memset(&timeout, 0, sizeof(timeout));
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
 
-    // if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
-    //     close(sckt);
-    //     std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
-    //     exit(1);
-    // }
+    if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
+        close(sckt);
+        std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
+        exit(1);
+    }
 }
 
 void listen_on_socket() {
@@ -148,10 +147,10 @@ char* read_from_socket(int sckt, size_t buff_size) {
     }
 
     if (FD_ISSET(sckt, &read_fds)) {
-        char* buffer = new char[buff_size];
+        char* buffer = new char[buff_size+1];
         ssize_t bytes_read = read(sckt, buffer, buff_size);
 
-        if (bytes_read < 0) {
+        if (bytes_read < buff_size) {
             perror("Read error");
             delete[] buffer;
             return nullptr;

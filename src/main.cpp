@@ -78,6 +78,8 @@ int main() {
             set_pin_value(PD, 15, 0);
             sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
         }
+
+        delete[] data;
     }
 
     clean();
