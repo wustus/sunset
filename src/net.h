@@ -10,6 +10,7 @@
 #include <cstring>
 #include <ifaddrs.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
@@ -39,11 +40,11 @@ struct NetInfo {
 
 void set_local_address();
 
-void net_clean();
 void create_socket();
 void bind_socket();
 void listen_on_socket();
 int accept_connection();
 char* read_from_socket(int, size_t);
+bool is_socket_connected(int);
 
 #endif

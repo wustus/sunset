@@ -1,5 +1,7 @@
 
 #include "net.h"
+#include <sys/_types/_fd_def.h>
+#include <sys/socket.h>
 
 NetInfo info;
 
@@ -40,10 +42,6 @@ void set_local_address() {
     }
 
     printf("IP Addr: %s", ip_addr);
-}
-
-void net_clean() {
-    close(info.socket);
 }
 
 void create_socket() {
@@ -127,8 +125,44 @@ int accept_connection() {
 
 char* read_from_socket(int sckt, size_t buff_size) {
 
-    char* buffer = new char[buff_size];
-    read(sckt, buffer, buff_size);
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(sckt, &read_fds);
 
-    return buffer;
+    struct timeval timeout;
+    std::memset(&timeout, 0, sizeof(timeval));
+
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+
+    int activity = select(sckt + 1, &read_fds, nullptr, nullptr, &timeout);
+
+    if (activity < 0) {
+        perror("Error when executing select");
+        exit(1);
+    }
+
+    if (activity == 0) {
+        std::cout << "Timeout" << std::endl;
+        return nullptr;
+    }
+
+    if (FD_ISSET(sckt, &read_fds)) {
+        char* buffer = new char[buff_size];
+        read(sckt, buffer, buff_size);
+
+        return buffer;
+    }
+
+    std::cout << "FD not set" << std::endl;
+
+    return nullptr;
+}
+
+bool is_socket_connected(int sckt) {
+
+    int err = 0;
+    socklen_t size = sizeof(int);
+
+    return getsockopt(sckt, SOL_SOCKET, SO_ERROR, &err, &size) != -1;
 }

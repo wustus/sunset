@@ -1,5 +1,6 @@
 
 #include "gpio.h"
+#include "helper.h"
 #include "net.h"
 #include <cstdint>
 #include <stdio.h>
@@ -38,9 +39,15 @@ int main() {
     listen_on_socket();
     int sckt = accept_connection();
 
-    char* data;
 
-    while ((data = read_from_socket(sckt, sizeof(MotorControl))) != 0) {
+    while (is_socket_connected(sckt)) {
+
+        char* data = read_from_socket(sckt, sizeof(MotorControl));
+
+        if (data == nullptr) {
+            sleep(std::chrono::microseconds(10'000));
+            continue;
+        }
 
         MotorControl* controls = reinterpret_cast<MotorControl*>(data);
 
