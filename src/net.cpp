@@ -139,13 +139,25 @@ char* read_from_socket(int sckt, size_t buff_size) {
         char* buffer = new char[buff_size+1];
         ssize_t bytes_read = read(sckt, buffer, buff_size);
 
-        if (bytes_read < buff_size) {
+        if (bytes_read == 0) {
+            perror("Timeout");
             delete[] buffer;
             return nullptr;
         }
 
         if (bytes_read < buff_size) {
             perror("Read error");
+            std::cout << bytes_read << " bytes read" << std::endl;
+            buffer[buff_size] = '\0';
+            for (char* ptr=buffer; *ptr!='\0'; ptr++) {
+
+                for (int i=7; i>=0; i--) {
+                    std::cout << ((*ptr >> i) & 1) << " ";
+                    std::cout << (int) *ptr;
+                    std::cout << (char) *ptr;
+                }
+                std::cout << std::endl;
+            }
             delete[] buffer;
             return nullptr;
         }
@@ -155,12 +167,11 @@ char* read_from_socket(int sckt, size_t buff_size) {
         for (char* ptr=buffer; *ptr!='\0'; ptr++) {
 
             for (int i=7; i>=0; i--) {
-                std::cout << ((*ptr >> i) & 1);
+                std::cout << ((*ptr >> i) & 1) << " ";
+                std::cout << (int) *ptr;
+                std::cout << (char) *ptr;
             }
-            std::cout << " ";
-
             std::cout << std::endl;
-
         }
 
         return buffer;
@@ -176,5 +187,5 @@ bool is_socket_connected(int sckt) {
     int err = 0;
     socklen_t size = sizeof(int);
 
-    return getsockopt(sckt, SOL_SOCKET, SO_ERROR, &err, &size) != -1;
+    return getsockopt(sckt, SOL_SOCKET, SO_ERROR, &err, &size) == 0;
 }
