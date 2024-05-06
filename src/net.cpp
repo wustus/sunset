@@ -154,12 +154,10 @@ char* read_from_socket(int sckt, size_t buff_size) {
 
         for (char* ptr=buffer; *ptr!='\0'; ptr++) {
 
-            for (int b=2; b>=0; b--) {
-                for (int i=7; i>=0; i--) {
-                    std::cout << ((*(buffer + b) >> i) & 1);
-                }
-                std::cout << " ";
+            for (int i=7; i>=0; i--) {
+                std::cout << ((*ptr >> i) & 1);
             }
+            std::cout << " ";
 
             std::cout << std::endl;
 
