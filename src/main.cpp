@@ -45,7 +45,7 @@ int main() {
         char* data = read_from_socket(sckt, sizeof(MotorControl));
 
         if (data == nullptr) {
-            sleep(std::chrono::microseconds(10'000));
+            sleep(std::chrono::microseconds(1'000'000));
             continue;
         }
 

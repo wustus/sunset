@@ -153,10 +153,19 @@ char* read_from_socket(int sckt, size_t buff_size) {
 
                 for (int i=7; i>=0; i--) {
                     std::cout << ((*ptr >> i) & 1) << " ";
-                    std::cout << (int) *ptr;
-                    std::cout << (char) *ptr;
                 }
                 std::cout << std::endl;
+                std::cout << "char" << std::endl;
+                for (int i=7; i>=0; i--) {
+                    std::cout << (char) *ptr << " ";
+                }
+                std::cout << std::endl;
+                std::cout << "int" << std::endl;
+                for (int i=7; i>=0; i--) {
+                    std::cout << (char) *ptr << " ";
+                }
+                std::cout << std::endl;
+                std::cout << "--------" << std::endl;
             }
             delete[] buffer;
             return nullptr;
