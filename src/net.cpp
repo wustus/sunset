@@ -149,7 +149,15 @@ char* read_from_socket(int sckt, size_t buff_size) {
 
     if (FD_ISSET(sckt, &read_fds)) {
         char* buffer = new char[buff_size];
-        read(sckt, buffer, buff_size);
+        ssize_t bytes_read = read(sckt, buffer, buff_size);
+
+        if (bytes_read < 0) {
+            perror("Read error");
+            delete[] buffer;
+            return nullptr;
+        }
+
+        buffer[buff_size] = '\0';
 
         return buffer;
     }
