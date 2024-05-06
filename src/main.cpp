@@ -27,12 +27,12 @@ int main() {
 
     std::signal(SIGINT, handle_signal);
 
-    // int err = init();
+    int err = init();
 
-    // if (err != 0) {
-    //     printf("exit 1\n");
-    //     exit(1);
-    // }
+    if (err != 0) {
+        printf("exit 1\n");
+        exit(1);
+    }
 
     create_socket();
     bind_socket();
@@ -55,9 +55,6 @@ int main() {
         std::cout << "Hz - " << (int) controls->hz << std::endl;
         std::cout << "Duration - " << (int) controls->duration << std::endl;
         std::cout << "Clockwise - " << controls->clockwise << std::endl;
-
-        char c;
-        std::cin >> c;
 
         int hz = (int) controls->hz;
         int duration = (int) controls->duration;
