@@ -56,6 +56,9 @@ int main() {
         std::cout << "Duration - " << (int) controls->duration << std::endl;
         std::cout << "Clockwise - " << controls->clockwise << std::endl;
 
+        char c;
+        std::cin >> c;
+
         int hz = (int) controls->hz;
         int duration = (int) controls->duration;
 
