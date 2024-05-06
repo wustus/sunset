@@ -27,12 +27,12 @@ int main() {
 
     std::signal(SIGINT, handle_signal);
 
-    int err = init();
+    // int err = init();
 
-    if (err != 0) {
-        printf("exit 1\n");
-        exit(1);
-    }
+    // if (err != 0) {
+    //     printf("exit 1\n");
+    //     exit(1);
+    // }
 
     create_socket();
     bind_socket();

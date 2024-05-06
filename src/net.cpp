@@ -77,20 +77,9 @@ void bind_socket() {
 
     int opt = 1;
 
-    if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
+    if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         close(sckt);
         std::cerr << "Unable to set Reuse Address option: " << strerror(errno) << std::endl;
-        exit(1);
-    }
-
-    struct timeval timeout;
-    std::memset(&timeout, 0, sizeof(timeout));
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
-
-    if (setsockopt(sckt, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) == -1) {
-        close(sckt);
-        std::cerr << "Unable to set Timeout socket option: " << strerror(errno) << std::endl;
         exit(1);
     }
 }
@@ -149,6 +138,11 @@ char* read_from_socket(int sckt, size_t buff_size) {
     if (FD_ISSET(sckt, &read_fds)) {
         char* buffer = new char[buff_size+1];
         ssize_t bytes_read = read(sckt, buffer, buff_size);
+
+        if (bytes_read < buff_size) {
+            delete[] buffer;
+            return nullptr;
+        }
 
         if (bytes_read < buff_size) {
             perror("Read error");
