@@ -76,7 +76,7 @@ int main() {
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
         std::cout << "Timeout: " << (t_sleep * 1'000'000) << std::endl;
 
-        for (int i=0; i!=hz * duration * 1600; i++) {
+        for (int i=0; i<hz * duration * 1600; i++) {
             set_pin_value(PD, 15, 1);
             sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
             set_pin_value(PD, 15, 0);
