@@ -47,44 +47,44 @@ int main() {
 
     while (is_socket_connected(sckt)) {
 
-        MotorControl* controls = new MotorControl;
-        std::memset(controls, 0, sizeof(MotorControl));
-        read_from_socket(sckt, controls, sizeof(MotorControl));
+        motorcontrol* mctl = new motorcontrol;
+        std::memset(mctl, 0, sizeof(motorcontrol));
+        read_from_socket(sckt, mctl, sizeof(motorcontrol));
 
-        if (*((char*) controls) == 0) {
+        if (*((char*) mctl) == 0) {
             sleep(std::chrono::microseconds(1'000'000));
-            delete controls;
+            delete mctl;
             continue;
         }
 
         std::cout << "Motor Controls:" << std::endl;
-        std::cout << "Hz - " << (unsigned) controls->hz << std::endl;
-        std::cout << "Duration - " << (unsigned) controls->duration << std::endl;
-        std::cout << "Clockwise - " << controls->clockwise << std::endl;
+        std::cout << "Hz - " << (unsigned) mctl->hz << std::endl;
+        std::cout << "Duration - " << (unsigned) mctl->duration << std::endl;
+        std::cout << "Clockwise - " << mctl->clockwise << std::endl;
 
-        int hz = (int) controls->hz;
-        int duration = (int) controls->duration;
+        int hz = (int) mctl->hz;
+        float duration = (float) mctl->duration;
 
         // in seconds
         float t_sleep = 1.0f / (1600 * hz * 2);
 
-        if ((bool) controls->clockwise) {
+        if ((bool) mctl->clockwise) {
             set_pin_value(PD, 16, 1);
         } else {
             set_pin_value(PD, 16, 0);
         }
 
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
-        std::cout << "Timeout: " << (uint32_t) (t_sleep * 1'000'000) << std::endl;
+        std::cout << "Timeout: " << (float) (t_sleep * 1'000) << std::endl;
 
         for (int i=0; i!=hz * duration * 1600; i++) {
             set_pin_value(PD, 15, 1);
-            sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
+            sleep(std::chrono::milliseconds((uint32_t) (t_sleep * 1'000)));
             set_pin_value(PD, 15, 0);
-            sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
+            sleep(std::chrono::milliseconds((uint32_t) (t_sleep * 1'000)));
         }
 
-        delete controls;
+        delete mctl;
     }
 
     std::cout << "Socket disconnected." << std::endl;
