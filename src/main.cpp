@@ -2,7 +2,6 @@
 #include "gpio.h"
 #include "helper.h"
 #include "net.h"
-#include <cstdint>
 #include <cstdlib>
 #include <stdio.h>
 #include <sys/fcntl.h>
@@ -51,7 +50,7 @@ int main() {
         std::memset(mctl, 0, sizeof(motorcontrol));
         read_from_socket(sckt, mctl, sizeof(motorcontrol));
 
-        if (*((char*) mctl) == 0) {
+        if (*((float*) mctl) == 0) {
             sleep(std::chrono::microseconds(1'000'000));
             delete mctl;
             continue;
@@ -59,7 +58,7 @@ int main() {
 
         std::cout << "Motor Controls:" << std::endl;
         std::cout << "Hz - " << (unsigned) mctl->hz << std::endl;
-        std::cout << "Duration - " << (unsigned) mctl->duration << std::endl;
+        std::cout << "Duration - " << (float) mctl->duration << std::endl;
         std::cout << "Clockwise - " << mctl->clockwise << std::endl;
 
         int hz = (int) mctl->hz;
@@ -75,13 +74,13 @@ int main() {
         }
 
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
-        std::cout << "Timeout: " << (float) (t_sleep * 1'000) << std::endl;
+        std::cout << "Timeout: " << (t_sleep * 1'000'000) << std::endl;
 
         for (int i=0; i!=hz * duration * 1600; i++) {
             set_pin_value(PD, 15, 1);
-            sleep(std::chrono::milliseconds((uint32_t) (t_sleep * 1'000)));
+            sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
             set_pin_value(PD, 15, 0);
-            sleep(std::chrono::milliseconds((uint32_t) (t_sleep * 1'000)));
+            sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
         }
 
         delete mctl;

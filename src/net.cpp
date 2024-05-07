@@ -146,8 +146,7 @@ void read_from_socket(int sckt, void* target, size_t buff_size) {
         return;
     }
 
-    if (bytes_recvd < 3) {
-        std::cout << "Less than 3 bytes" << std::endl;
+    if (bytes_recvd < buff_size) {
         std::cout << bytes_recvd << " bytes read" << std::endl;
     }
 
