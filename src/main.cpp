@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "net.h"
 #include <cstdint>
+#include <cstdlib>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -46,22 +47,20 @@ int main() {
 
     while (is_socket_connected(sckt)) {
 
-        char* data = read_from_socket(sckt, sizeof(MotorControl));
+        MotorControl* controls = new MotorControl;
+        std::memset(controls, 0, sizeof(MotorControl));
+        read_from_socket(sckt, controls, sizeof(MotorControl));
 
-        if (data == nullptr) {
+        if (*((char*) controls) == 0) {
             sleep(std::chrono::microseconds(1'000'000));
+            delete controls;
             continue;
         }
 
-        MotorControl* controls = reinterpret_cast<MotorControl*>(data);
-
         std::cout << "Motor Controls:" << std::endl;
-        std::cout << "Hz - " << (int) controls->hz << std::endl;
-        std::cout << "Duration - " << (int) controls->duration << std::endl;
+        std::cout << "Hz - " << (unsigned) controls->hz << std::endl;
+        std::cout << "Duration - " << (unsigned) controls->duration << std::endl;
         std::cout << "Clockwise - " << controls->clockwise << std::endl;
-
-        char c;
-        std::cin >> c;
 
         int hz = (int) controls->hz;
         int duration = (int) controls->duration;
@@ -69,8 +68,10 @@ int main() {
         // in seconds
         float t_sleep = 1.0f / (1600 * hz * 2);
 
-        if (controls->clockwise) {
+        if ((bool) controls->clockwise) {
             set_pin_value(PD, 16, 1);
+        } else {
+            set_pin_value(PD, 16, 0);
         }
 
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
@@ -83,8 +84,10 @@ int main() {
             sleep(std::chrono::microseconds((uint32_t) (t_sleep * 1'000'000)));
         }
 
-        delete[] data;
+        delete controls;
     }
+
+    std::cout << "Socket disconnected." << std::endl;
 
     clean();
 

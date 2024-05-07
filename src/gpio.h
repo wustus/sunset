@@ -70,11 +70,13 @@ struct GPIO {
     uint32_t* reg_base;
 };
 
+#pragma pack(push, 1)
 struct MotorControl {
     uint8_t hz;
     uint8_t duration;
     bool clockwise;
 };
+#pragma pack(pop)
 
 int init();
 void clean();

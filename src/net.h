@@ -44,7 +44,7 @@ void create_socket();
 void bind_socket();
 void listen_on_socket();
 int accept_connection();
-char* read_from_socket(int, size_t);
+void read_from_socket(int, void*, size_t);
 bool is_socket_connected(int);
 
 #endif

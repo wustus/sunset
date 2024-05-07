@@ -115,27 +115,35 @@ int accept_connection() {
 
     timeout.tv_sec = 5;
     timeout.tv_usec = 0;
-
     
     if (setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeval)) == -1) {
         perror("Unable to set connection timeout");
         return -1;
     }
 
+    if (setsockopt(sckt, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        close(sckt);
+        std::cerr << "Unable to set Reuse Address option: " << strerror(errno) << std::endl;
+        exit(1);
+    }
+
     return conn;
 }
 
-char* read_from_socket(int sckt, size_t buff_size) {
+void read_from_socket(int sckt, void* target, size_t buff_size) {
 
+    int bytes_recvd = recv(sckt, target, buff_size, 0);
 
-    char* buffer = new char[buff_size+1];
-
-    int bytes_recvd = recv(sckt, buffer, buff_size, 0);
+    if (bytes_recvd == -1) {
+        perror("Error receiving");
+        target = nullptr;
+        return;
+    }
 
     if (bytes_recvd == 0) {
         perror("Timeout?");
-        delete[] buffer;
-        return nullptr;
+        target = nullptr;
+        return;
     }
 
     if (bytes_recvd < 3) {
@@ -143,8 +151,9 @@ char* read_from_socket(int sckt, size_t buff_size) {
         std::cout << bytes_recvd << " bytes read" << std::endl;
     }
 
-    buffer[buff_size] = '\0';
+    return;
 
+    /*
     for (char* ptr=buffer; *ptr!='\0'; ptr++) {
 
         for (int i=7; i>=0; i--) {
@@ -152,14 +161,10 @@ char* read_from_socket(int sckt, size_t buff_size) {
         }
         std::cout << std::endl;
         std::cout << "char" << std::endl;
-        for (int i=7; i>=0; i--) {
-            std::cout << (char) *ptr << " ";
-        }
+        std::cout << (char) *ptr << std::endl;
         std::cout << std::endl;
         std::cout << "int" << std::endl;
-        for (int i=7; i>=0; i--) {
-            std::cout << (char) *ptr << " ";
-        }
+        std::cout << (int) *ptr << std::endl;
         std::cout << std::endl;
         std::cout << "--------" << std::endl;
     }
@@ -170,20 +175,24 @@ char* read_from_socket(int sckt, size_t buff_size) {
     }
 
     return buffer;
+    */
 }
 
 bool is_socket_connected(int sckt) {
 
     char buf;
-    int bytes_read = recv(sckt, &buf, 0, MSG_PEEK);
+    int bytes_read = recv(sckt, &buf, 1, MSG_PEEK);
 
-    if (bytes_read == EAGAIN) {
-        return true;
+    if (bytes_read == 0) {
+        std::cout << "Connection closed by peer." << std::endl;
+        return false;
     }
 
-    if (bytes_read == EWOULDBLOCK) {
-        return true;
+    if (bytes_read == -1) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return true;
+        }
     }
-
-    return bytes_read == -1;
+    
+    return true;
 }
