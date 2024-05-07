@@ -39,6 +39,10 @@ int main() {
     listen_on_socket();
     int sckt = accept_connection();
 
+    if (sckt == -1) {
+        std::cout << "Failed idk" << std::endl;
+        return 1;
+    }
 
     while (is_socket_connected(sckt)) {
 

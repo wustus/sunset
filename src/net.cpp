@@ -1,5 +1,6 @@
 
 #include "net.h"
+#include <cerrno>
 #include <sys/socket.h>
 
 NetInfo info;
@@ -108,93 +109,81 @@ int accept_connection() {
 
     std::cout << "Accepted connection." << std::endl;
 
-    return conn;
-}
-
-char* read_from_socket(int sckt, size_t buff_size) {
-
-    fd_set read_fds;
-    FD_ZERO(&read_fds);
-    FD_SET(sckt, &read_fds);
-
+    int opt = 1;
     struct timeval timeout;
     std::memset(&timeout, 0, sizeof(timeval));
 
     timeout.tv_sec = 5;
     timeout.tv_usec = 0;
 
-    int activity = select(sckt + 1, &read_fds, nullptr, nullptr, &timeout);
-
-    if (activity < 0) {
-        perror("Error when executing select");
-        exit(1);
+    
+    if (setsockopt(conn, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeval)) == -1) {
+        perror("Unable to set connection timeout");
+        return -1;
     }
 
-    if (activity == 0) {
-        std::cout << "Timeout" << std::endl;
+    return conn;
+}
+
+char* read_from_socket(int sckt, size_t buff_size) {
+
+
+    char* buffer = new char[buff_size+1];
+
+    int bytes_recvd = recv(sckt, buffer, buff_size, 0);
+
+    if (bytes_recvd == 0) {
+        perror("Timeout?");
+        delete[] buffer;
         return nullptr;
     }
 
-    if (FD_ISSET(sckt, &read_fds)) {
-        char* buffer = new char[buff_size+1];
-        ssize_t bytes_read = read(sckt, buffer, buff_size);
-
-        if (bytes_read == 0) {
-            perror("Timeout");
-            delete[] buffer;
-            return nullptr;
-        }
-
-        if (bytes_read < buff_size) {
-            perror("Read error");
-            std::cout << bytes_read << " bytes read" << std::endl;
-            buffer[buff_size] = '\0';
-            for (char* ptr=buffer; *ptr!='\0'; ptr++) {
-
-                for (int i=7; i>=0; i--) {
-                    std::cout << ((*ptr >> i) & 1) << " ";
-                }
-                std::cout << std::endl;
-                std::cout << "char" << std::endl;
-                for (int i=7; i>=0; i--) {
-                    std::cout << (char) *ptr << " ";
-                }
-                std::cout << std::endl;
-                std::cout << "int" << std::endl;
-                for (int i=7; i>=0; i--) {
-                    std::cout << (char) *ptr << " ";
-                }
-                std::cout << std::endl;
-                std::cout << "--------" << std::endl;
-            }
-            delete[] buffer;
-            return nullptr;
-        }
-
-        buffer[buff_size] = '\0';
-
-        for (char* ptr=buffer; *ptr!='\0'; ptr++) {
-
-            for (int i=7; i>=0; i--) {
-                std::cout << ((*ptr >> i) & 1) << " ";
-                std::cout << (int) *ptr;
-                std::cout << (char) *ptr;
-            }
-            std::cout << std::endl;
-        }
-
-        return buffer;
+    if (bytes_recvd < 3) {
+        std::cout << "Less than 3 bytes" << std::endl;
+        std::cout << bytes_recvd << " bytes read" << std::endl;
     }
 
-    std::cout << "FD not set" << std::endl;
+    buffer[buff_size] = '\0';
 
-    return nullptr;
+    for (char* ptr=buffer; *ptr!='\0'; ptr++) {
+
+        for (int i=7; i>=0; i--) {
+            std::cout << ((*ptr >> i) & 1) << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "char" << std::endl;
+        for (int i=7; i>=0; i--) {
+            std::cout << (char) *ptr << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "int" << std::endl;
+        for (int i=7; i>=0; i--) {
+            std::cout << (char) *ptr << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "--------" << std::endl;
+    }
+
+    if (bytes_recvd < 3) {
+        delete[] buffer;
+        return nullptr;
+    }
+
+    return buffer;
 }
 
 bool is_socket_connected(int sckt) {
 
-    int err = 0;
-    socklen_t size = sizeof(int);
+    char buf;
+    int bytes_read = recv(sckt, &buf, 0, MSG_PEEK);
 
-    return getsockopt(sckt, SOL_SOCKET, SO_ERROR, &err, &size) == 0;
+    if (bytes_read == EAGAIN) {
+        return true;
+    }
+
+    if (bytes_read == EWOULDBLOCK) {
+        return true;
+    }
+
+    return bytes_read == -1;
 }
