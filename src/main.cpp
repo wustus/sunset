@@ -57,7 +57,7 @@ int main() {
         }
 
         std::cout << "Motor Controls:" << std::endl;
-        std::cout << "Hz - " << (unsigned) mctl->hz << std::endl;
+        std::cout << "Hz - " << (float) mctl->hz << std::endl;
         std::cout << "Duration - " << (float) mctl->duration << std::endl;
         std::cout << "Clockwise - " << mctl->clockwise << std::endl;
 

@@ -73,7 +73,7 @@ struct GPIO {
 #pragma pack(push, 1)
 struct motorcontrol {
     float duration;
-    uint8_t hz;
+    float hz;
     bool clockwise;
 };
 #pragma pack(pop)
