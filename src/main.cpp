@@ -61,7 +61,7 @@ int main() {
         std::cout << "Duration - " << (float) mctl->duration << std::endl;
         std::cout << "Clockwise - " << mctl->clockwise << std::endl;
 
-        int hz = (int) mctl->hz;
+        float hz = (float) mctl->hz;
         float duration = (float) mctl->duration;
 
         // in seconds
