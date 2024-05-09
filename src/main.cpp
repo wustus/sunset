@@ -77,8 +77,7 @@ int main() {
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
         std::cout << "Timeout: " << (t_sleep * 1'000'000) << std::endl;
 
-        time_t initial_t, end_t;
-        time(&initial_t);
+        auto initial_t = std::chrono::high_resolution_clock::now();
 
         for (int i=0; i<(int)(hz * duration * 1600.0f); i++) {
             set_pin_value(PD, 15, 1);
@@ -87,10 +86,10 @@ int main() {
             sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
         }
 
-        time(&end_t);
-        float elapsed = difftime(end_t, initial_t);
+        auto end_t = std::chrono::high_resolution_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end_t - initial_t);
 
-        std::cout << elapsed << " seconds passed" << std::endl;
+        std::cout << elapsed.count() << " milliseconds passed" << std::endl;
 
         delete mctl;
     }
