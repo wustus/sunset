@@ -51,7 +51,7 @@ int main() {
         read_from_socket(sckt, mctl, sizeof(motorcontrol));
 
         if (*((float*) mctl) == 0) {
-            sleep(std::chrono::microseconds(1'000'000));
+            sleep(std::chrono::microseconds(1'000));
             delete mctl;
             continue;
         }
