@@ -34,7 +34,7 @@ int init() {
 }
 
 void clean() {
-    set_pin_value(PD, 16, 0);
+    set_pin_value(nullptr, PD, 16, 0);
     print_memory(gpio.reg_base, 32);
     munmap(gpio.reg_base, GPIO_MEMORY_LENGTH);
 }
@@ -85,9 +85,11 @@ void set_pin_direction(uint32_t pin, uint32_t pin_id, uint32_t dir) {
 }
 
 
-void set_pin_value(uint32_t pin, uint32_t pin_id, uint32_t val) {
+uint32_t* set_pin_value(uint32_t* reg, uint32_t pin, uint32_t pin_id, uint32_t val) {
 
-    uint32_t* reg = get_register(DAT, pin);
+    if (reg == nullptr) {
+        reg = get_register(DAT, pin);
+    }
 
     uint32_t pin_mask = ~(0x1 << pin_id);
     uint32_t pin_val = val << pin_id;
@@ -98,4 +100,6 @@ void set_pin_value(uint32_t pin, uint32_t pin_id, uint32_t val) {
     reg_val |= pin_val;
 
     *reg = reg_val;
+
+    return reg;
 }

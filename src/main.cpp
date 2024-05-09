@@ -3,7 +3,6 @@
 #include "helper.h"
 #include "net.h"
 #include <cstdlib>
-#include <ctime>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -69,21 +68,26 @@ int main() {
         float t_sleep = 1.0f / (1600 * hz * 2);
 
         if ((bool) mctl->clockwise) {
-            set_pin_value(PD, 16, 1);
+            set_pin_value(nullptr, PD, 16, 1);
         } else {
-            set_pin_value(PD, 16, 0);
+            set_pin_value(nullptr, PD, 16, 0);
         }
 
+        int timeout = t_sleep * 1'000'000'000;
+
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
-        std::cout << "Timeout: " << (t_sleep * 1'000'000) << std::endl;
+        std::cout << "Timeout: " << timeout << std::endl;
 
         auto initial_t = std::chrono::high_resolution_clock::now();
+        int n_steps = (int)(hz * duration * 1600.0f);
+
+        uint32_t* step_reg = nullptr;
 
         for (int i=0; i<(int)(hz * duration * 1600.0f); i++) {
-            set_pin_value(PD, 15, 1);
-            sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
-            set_pin_value(PD, 15, 0);
-            sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
+            step_reg = set_pin_value(step_reg, PD, 15, 1);
+            sleep_nano(std::chrono::nanoseconds(timeout));
+            step_reg = set_pin_value(step_reg, PD, 15, 0);
+            sleep_nano(std::chrono::nanoseconds(timeout));
         }
 
         auto end_t = std::chrono::high_resolution_clock::now();

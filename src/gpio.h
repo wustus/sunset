@@ -84,7 +84,7 @@ void clean();
 uint32_t get_conf_register(uint32_t pin_id);
 uint32_t* get_register(uint32_t reg, uint32_t pin);
 void set_pin_direction(uint32_t pin, uint32_t pin_id, uint32_t dir);
-void set_pin_value(uint32_t pin, uint32_t pin_id, uint32_t val);
+uint32_t* set_pin_value(uint32_t* reg, uint32_t pin, uint32_t pin_id, uint32_t val);
 
 
 #endif

@@ -38,7 +38,3 @@ void print_memory(uint32_t* addr, uint32_t bytes) {
         print_register(addr + i);
     }
 }
-
-void sleep(std::chrono::microseconds duration) {
-    std::this_thread::sleep_for(duration);
-}
