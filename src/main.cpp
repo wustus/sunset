@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "net.h"
 #include <cstdlib>
+#include <ctime>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
@@ -76,12 +77,20 @@ int main() {
         std::cout << "Steps: " << hz * duration * 1600 << std::endl;
         std::cout << "Timeout: " << (t_sleep * 1'000'000) << std::endl;
 
-        for (int i=0; i<hz * duration * 1600; i++) {
+        time_t initial_t, end_t;
+        time(&initial_t);
+
+        for (int i=0; i<(int)(hz * duration * 1600.0f); i++) {
             set_pin_value(PD, 15, 1);
             sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
             set_pin_value(PD, 15, 0);
             sleep(std::chrono::microseconds((int) (t_sleep * 1'000'000)));
         }
+
+        time(&end_t);
+        float elapsed = difftime(end_t, initial_t);
+
+        std::cout << elapsed << " seconds passed" << std::endl;
 
         delete mctl;
     }
